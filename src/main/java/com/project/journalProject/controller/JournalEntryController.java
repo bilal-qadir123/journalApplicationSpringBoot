@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -21,32 +20,25 @@ public class JournalEntryController {
         this.journalEntryService = journalEntryService;
     }
 
-    @PostMapping
-    public ResponseEntity<JournalEntry> createEntry(@RequestBody JournalEntry myEntry) {
-        myEntry.setDate(LocalDateTime.now());
-        return ResponseEntity.ok(journalEntryService.createEntry(myEntry));
+    @PostMapping("{userName}")
+    public ResponseEntity<JournalEntry> createEntry(@RequestBody JournalEntry myEntry, @PathVariable String userName) {
+        return ResponseEntity.ok(journalEntryService.createEntry(myEntry, userName));
     }
 
-    @GetMapping
-    public ResponseEntity<List<JournalEntry>> getAll() {
-        return ResponseEntity.ok(journalEntryService.getAll());
+    @GetMapping("{userName}")
+    public ResponseEntity<List<JournalEntry>> getAllJournalEntriesForUser(@PathVariable String userName) {
+        return ResponseEntity.ok(journalEntryService.getAllJournalEntriesForUser(userName));
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<JournalEntry> findEntryByID(@PathVariable ObjectId id) {
-        return journalEntryService.getEntryByID(id)
+    @DeleteMapping("{userName}/{id}")
+    public ResponseEntity<JournalEntry> deleteByUserNameAndID(@PathVariable String userName, @PathVariable ObjectId id) {
+        return journalEntryService.deleteByUserNameAndID(userName, id)
                 .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<JournalEntry> deleteByID(@PathVariable ObjectId id) {
-        return journalEntryService.deleteByID(id)
-                .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
-
-    @PutMapping("{id}")
-    public ResponseEntity<JournalEntry> updateByID(@PathVariable ObjectId id, @RequestBody JournalEntry entry) {
-        return journalEntryService.updateEntryByID(id, entry)
+    @PutMapping("{userName}/{id}")
+    public ResponseEntity<JournalEntry> updateByNameAndID(@PathVariable String userName, @PathVariable ObjectId id, @RequestBody JournalEntry entry) {
+        return journalEntryService.updateByNameAndID(userName, id, entry)
                 .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 }
