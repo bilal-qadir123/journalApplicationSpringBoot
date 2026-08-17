@@ -1,6 +1,6 @@
 package com.project.journalProject.service;
 
-import com.project.journalProject.JournalEntryRepository;
+import com.project.journalProject.repository.JournalEntryRepository;
 import com.project.journalProject.entity.JournalEntry;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +47,10 @@ public class JournalEntryService {
         if(entry.isPresent()) {
             JournalEntry oldEntry = entry.get();
 
-            if (newEntry.getTitle() != null && !newEntry.getTitle().isBlank()) {
+            if (!newEntry.getTitle().isBlank()) {
                 oldEntry.setTitle(newEntry.getTitle());
             }
-            if (newEntry.getContent() != null && !newEntry.getContent().isBlank()) {
+            if (!newEntry.getContent().isBlank()) {
                 oldEntry.setContent(newEntry.getContent());
             }
             if (newEntry.getDate() != null) {

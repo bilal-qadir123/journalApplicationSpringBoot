@@ -1,4 +1,4 @@
-package com.project.journalProject;
+package com.project.journalProject.repository;
 
 import com.project.journalProject.entity.JournalEntry;
 import org.bson.types.ObjectId;
