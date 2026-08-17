@@ -1,68 +1,52 @@
 package com.project.journalProject.controller;
 
 import com.project.journalProject.entity.JournalEntry;
+import com.project.journalProject.service.JournalEntryService;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("journal")
 public class JournalEntryController {
 
-    private Map<Long, JournalEntry> journalEntries = new HashMap<>();
+    private final JournalEntryService journalEntryService;
 
-    @GetMapping
-    public List<JournalEntry> getAll() {
-        return new ArrayList<>(journalEntries.values());
+    @Autowired
+    public JournalEntryController(JournalEntryService journalEntryService) {
+        this.journalEntryService = journalEntryService;
     }
 
     @PostMapping
     public ResponseEntity<JournalEntry> createEntry(@RequestBody JournalEntry myEntry) {
-        if (!journalEntries.containsKey(myEntry.getId())) {
-            journalEntries.put(myEntry.getId(), myEntry);
-            return ResponseEntity.ok(myEntry);
-        }
-        return ResponseEntity.badRequest().build();
+        myEntry.setDate(LocalDateTime.now());
+        return ResponseEntity.ok(journalEntryService.createEntry(myEntry));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<JournalEntry>> getAll() {
+        return ResponseEntity.ok(journalEntryService.getAll());
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<JournalEntry> getJournalEntryByID(@PathVariable Long id) {
-        if (journalEntries.containsKey(id)) {
-            return ResponseEntity.ok(journalEntries.get(id));
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<JournalEntry> findEntryByID(@PathVariable ObjectId id) {
+        return journalEntryService.getEntryByID(id)
+                .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("{id}")
-    public Map<String, Object> deleteEntry(@PathVariable Long id) {
-
-        Map<String, Object> response = new HashMap<>();
-        JournalEntry removed = journalEntries.remove(id);
-
-        if (removed == null) {
-            response.put("message", "ID does not exist");
-            response.put("id", id);
-            return response;
-        }
-
-        response.put("success", true);
-        response.put("removed", id);
-        response.put("entries", new ArrayList<>(journalEntries.values()));
-
-        return response;
+    public ResponseEntity<JournalEntry> deleteByID(@PathVariable ObjectId id) {
+        return journalEntryService.deleteByID(id)
+                .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<JournalEntry> updateEntry (@PathVariable Long id, @RequestBody JournalEntry myEntry) {
-        if (!Objects.equals(myEntry.getId(), id)) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        if (journalEntries.containsKey(id)) {
-            journalEntries.put(id, myEntry);
-            return ResponseEntity.ok(myEntry);
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<JournalEntry> updateByID(@PathVariable ObjectId id, @RequestBody JournalEntry entry) {
+        return journalEntryService.updateEntryByID(id, entry)
+                .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 }
