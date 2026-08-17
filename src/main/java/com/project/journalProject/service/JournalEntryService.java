@@ -4,12 +4,12 @@ import com.project.journalProject.JournalEntryRepository;
 import com.project.journalProject.entity.JournalEntry;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Component
+@Service
 public class JournalEntryService {
 
     private final JournalEntryRepository journalEntryRepository;
@@ -33,8 +33,12 @@ public class JournalEntryService {
 
     public Optional<JournalEntry> deleteByID(ObjectId id) {
         Optional<JournalEntry> entry = journalEntryRepository.findById(id);
-        journalEntryRepository.deleteById(id);
-        return entry;
+
+        if(entry.isPresent()) {
+            journalEntryRepository.deleteById(id);
+            return entry;
+        }
+        return Optional.empty();
     }
 
     public Optional<JournalEntry> updateEntryByID(ObjectId id, JournalEntry newEntry) {
@@ -43,10 +47,10 @@ public class JournalEntryService {
         if(entry.isPresent()) {
             JournalEntry oldEntry = entry.get();
 
-            if (newEntry.getTitle() != null && !newEntry.getTitle().equals("")) {
+            if (newEntry.getTitle() != null && !newEntry.getTitle().isBlank()) {
                 oldEntry.setTitle(newEntry.getTitle());
             }
-            if (newEntry.getContent() != null && !newEntry.getContent().equals("")) {
+            if (newEntry.getContent() != null && !newEntry.getContent().isBlank()) {
                 oldEntry.setContent(newEntry.getContent());
             }
             if (newEntry.getDate() != null) {
