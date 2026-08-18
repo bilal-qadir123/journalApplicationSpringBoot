@@ -7,6 +7,7 @@ import com.project.journalProject.repository.UserEntryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,17 +25,22 @@ public class JournalEntryService {
         this.userEntryRepository = userEntryRepository;
     }
 
+    @Transactional
     public JournalEntry createEntry(JournalEntry journalEntry, String userName) {
-        Optional<UserEntry> userEntry = userEntryRepository.findByUserName(userName);
+        try {
+            Optional<UserEntry> userEntry = userEntryRepository.findByUserName(userName);
 
-        if (userEntry.isPresent()) {
-            journalEntry.setDate(LocalDateTime.now());
+            if (userEntry.isPresent()) {
+                journalEntry.setDate(LocalDateTime.now());
 
-            JournalEntry savedEntry = journalEntryRepository.save(journalEntry);
-            userEntry.get().getJournalEntryList().add(savedEntry);
-            userEntryRepository.save(userEntry.get());
+                JournalEntry savedEntry = journalEntryRepository.save(journalEntry);
+                userEntry.get().getJournalEntryList().add(savedEntry);
+                userEntryRepository.save(userEntry.get());
 
-            return savedEntry;
+                return savedEntry;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred while saving the entry", e);
         }
         return null;
     }
