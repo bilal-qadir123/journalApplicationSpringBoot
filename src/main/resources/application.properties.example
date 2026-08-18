@@ -1,0 +1,2 @@
+spring.mongodb.uri=mongodb+srv://<username>:<password>@<cluster-url>/<database-name>
+spring.data.mongodb.auto-index-creation=true
