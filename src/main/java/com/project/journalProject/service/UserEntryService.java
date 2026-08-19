@@ -24,9 +24,15 @@ public class UserEntryService {
         this.journalEntryRepository = journalEntryRepository;
     }
 
-    public UserEntry createEntry(UserEntry userEntry) {
+    public UserEntry createNewUser(UserEntry userEntry) {
         userEntry.setPassword(passwordEncoder.encode(userEntry.getPassword()));
         userEntry.setRoles(List.of("USER"));
+        return userEntryRepository.save(userEntry);
+    }
+
+    public UserEntry createNewAdmin(UserEntry userEntry) {
+        userEntry.setPassword(passwordEncoder.encode(userEntry.getPassword()));
+        userEntry.setRoles(List.of("USER", "ADMIN"));
         return userEntryRepository.save(userEntry);
     }
 

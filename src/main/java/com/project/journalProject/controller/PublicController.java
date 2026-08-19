@@ -19,6 +19,6 @@ public class PublicController {
 
     @PostMapping
     public ResponseEntity<UserEntry> createEntry(@RequestBody UserEntry myEntry) {
-        return ResponseEntity.ok(userEntryService.createEntry(myEntry));
+        return ResponseEntity.ok(userEntryService.createNewUser(myEntry));
     }
 }
