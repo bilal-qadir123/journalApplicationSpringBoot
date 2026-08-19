@@ -50,6 +50,19 @@ public class JournalEntryService {
         return userEntry.map(UserEntry::getJournalEntryList).orElse(null);
     }
 
+    public Optional<JournalEntry> getJournalEntriesByUser(String userName, ObjectId id) {
+        Optional<UserEntry> entry = userEntryRepository.findByUserName(userName);
+
+        if(entry.isPresent()) {
+            JournalEntry journalEntry = entry.get().getJournalEntryList().stream().
+                    filter(x -> x.getId().equals(id)).findFirst().orElse(null);
+            if (journalEntry != null) {
+                return Optional.of(journalEntry);
+            }
+        }
+        return Optional.empty();
+    }
+
     public Optional<JournalEntry> deleteByUserNameAndID(String userName, ObjectId id) {
         Optional<UserEntry> entry = userEntryRepository.findByUserName(userName);
 
@@ -67,7 +80,7 @@ public class JournalEntryService {
         return Optional.empty();
     }
 
-    public Optional<JournalEntry> updateByNameAndID(String userName, ObjectId id, JournalEntry newEntry) {
+    public Optional<JournalEntry> updateByUserNameAndID(String userName, ObjectId id, JournalEntry newEntry) {
         Optional<UserEntry> entry = userEntryRepository.findByUserName(userName);
 
         if(entry.isPresent()) {

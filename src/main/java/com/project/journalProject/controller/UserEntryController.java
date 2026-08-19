@@ -8,8 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("user")
 public class UserEntryController {
@@ -21,14 +19,17 @@ public class UserEntryController {
         this.userEntryService = userEntryService;
     }
 
+    /* Kept for future use by admin */
     @GetMapping("{userName}")
     public ResponseEntity<UserEntry> findEntryByUserName(@PathVariable String userName) {
         return userEntryService.getEntryByUserName(userName)
                 .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("{userName}")
-    public ResponseEntity<UserEntry> deleteByUserName(@PathVariable String userName) {
+    @DeleteMapping()
+    public ResponseEntity<UserEntry> deleteByUserName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
         return userEntryService.deleteByUserName(userName)
                 .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }

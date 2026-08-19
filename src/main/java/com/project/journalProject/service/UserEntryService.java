@@ -24,7 +24,7 @@ public class UserEntryService {
         this.journalEntryRepository = journalEntryRepository;
     }
 
-    public UserEntry saveEntry(UserEntry userEntry) {
+    public UserEntry createEntry(UserEntry userEntry) {
         userEntry.setPassword(passwordEncoder.encode(userEntry.getPassword()));
         userEntry.setRoles(List.of("USER"));
         return userEntryRepository.save(userEntry);
