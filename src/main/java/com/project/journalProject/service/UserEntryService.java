@@ -1,8 +1,11 @@
 package com.project.journalProject.service;
 
 import com.project.journalProject.entity.UserEntry;
+import com.project.journalProject.repository.JournalEntryRepository;
 import com.project.journalProject.repository.UserEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,18 +15,19 @@ import java.util.Optional;
 public class UserEntryService {
 
     private final UserEntryRepository userEntryRepository;
+    private final JournalEntryRepository journalEntryRepository;
+    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
-    public UserEntryService(UserEntryRepository userEntryRepository) {
+    public UserEntryService(UserEntryRepository userEntryRepository, JournalEntryRepository journalEntryRepository) {
         this.userEntryRepository = userEntryRepository;
+        this.journalEntryRepository = journalEntryRepository;
     }
 
     public UserEntry saveEntry(UserEntry userEntry) {
+        userEntry.setPassword(passwordEncoder.encode(userEntry.getPassword()));
+        userEntry.setRoles(List.of("USER"));
         return userEntryRepository.save(userEntry);
-    }
-
-    public List<UserEntry> getAll() {
-        return userEntryRepository.findAll();
     }
 
     public Optional<UserEntry> getEntryByUserName(String userName) {
@@ -34,7 +38,8 @@ public class UserEntryService {
         Optional<UserEntry> entry = userEntryRepository.findByUserName(userName);
 
         if (entry.isPresent()) {
-            userEntryRepository.deleteByUserName(userName);
+            journalEntryRepository.deleteAll(entry.get().getJournalEntryList());
+            userEntryRepository.delete(entry.get());
             return entry;
         }
 
@@ -52,7 +57,11 @@ public class UserEntryService {
             }
 
             if (!newEntry.getPassword().isBlank()) {
-                oldEntry.setPassword(newEntry.getPassword());
+                oldEntry.setPassword(passwordEncoder.encode(newEntry.getPassword()));
+            }
+
+            if(newEntry.getRoles() != null && !newEntry.getRoles().isEmpty()) {
+                oldEntry.setRoles(newEntry.getRoles());
             }
 
             return Optional.of(userEntryRepository.save(oldEntry));

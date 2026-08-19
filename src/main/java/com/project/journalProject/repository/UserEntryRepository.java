@@ -9,6 +9,4 @@ import java.util.Optional;
 public interface UserEntryRepository extends MongoRepository<UserEntry, ObjectId> {
 
     Optional<UserEntry> findByUserName(String userName);
-
-    void deleteByUserName(String userName);
 }

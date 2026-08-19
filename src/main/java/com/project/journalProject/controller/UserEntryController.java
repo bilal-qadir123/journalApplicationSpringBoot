@@ -4,6 +4,8 @@ import com.project.journalProject.entity.UserEntry;
 import com.project.journalProject.service.UserEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,16 +21,6 @@ public class UserEntryController {
         this.userEntryService = userEntryService;
     }
 
-    @PostMapping
-    public ResponseEntity<UserEntry> createEntry(@RequestBody UserEntry myEntry) {
-        return ResponseEntity.ok(userEntryService.saveEntry(myEntry));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UserEntry>> getAll() {
-        return ResponseEntity.ok(userEntryService.getAll());
-    }
-
     @GetMapping("{userName}")
     public ResponseEntity<UserEntry> findEntryByUserName(@PathVariable String userName) {
         return userEntryService.getEntryByUserName(userName)
@@ -41,9 +33,10 @@ public class UserEntryController {
                 .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("{userName}")
-    public ResponseEntity<UserEntry> updateByUserName(@PathVariable String userName, @RequestBody UserEntry entry) {
-
+    @PutMapping
+    public ResponseEntity<UserEntry> updateByUserName(@RequestBody UserEntry entry) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
         return userEntryService.updateEntryByUserName(userName, entry)
                 .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
