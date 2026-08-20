@@ -3,6 +3,7 @@ package com.project.journalProject.service;
 import com.project.journalProject.entity.UserEntry;
 import com.project.journalProject.repository.JournalEntryRepository;
 import com.project.journalProject.repository.UserEntryRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,10 +13,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class UserEntryService {
 
     private final UserEntryRepository userEntryRepository;
     private final JournalEntryRepository journalEntryRepository;
+
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
@@ -49,6 +52,7 @@ public class UserEntryService {
             return entry;
         }
 
+        log.info("User {} not found", userName);
         return Optional.empty();
     }
 
@@ -73,6 +77,7 @@ public class UserEntryService {
             return Optional.of(userEntryRepository.save(oldEntry));
         }
 
+        log.info("User {} not found", userName);
         return Optional.empty();
     }
 }

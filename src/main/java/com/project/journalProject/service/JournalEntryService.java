@@ -4,6 +4,7 @@ import com.project.journalProject.entity.UserEntry;
 import com.project.journalProject.repository.JournalEntryRepository;
 import com.project.journalProject.entity.JournalEntry;
 import com.project.journalProject.repository.UserEntryRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class JournalEntryService {
 
     private final JournalEntryRepository journalEntryRepository;
@@ -40,7 +42,7 @@ public class JournalEntryService {
                 return savedEntry;
             }
         } catch (Exception e) {
-            throw new RuntimeException("An error occurred while saving the entry", e);
+            log.error("An error occurred while saving the journal", e);
         }
         return null;
     }
@@ -60,6 +62,7 @@ public class JournalEntryService {
                 return Optional.of(journalEntry);
             }
         }
+        log.info("Journal not found for user {}", userName);
         return Optional.empty();
     }
 
@@ -76,7 +79,10 @@ public class JournalEntryService {
                 journalEntryRepository.deleteById(id);
                 return Optional.of(journalEntry);
             }
+            log.info("Journal not found for user {}", userName);
+            return Optional.empty();
         }
+        log.info("User {} not found", userName);
         return Optional.empty();
     }
 
@@ -88,6 +94,7 @@ public class JournalEntryService {
                     filter(x -> x.getId().equals(id)).findFirst().orElse(null);
 
             if (journalEntry == null) {
+                log.info("Journal {} not found for user {}", id, userName);
                 return Optional.empty();
             }
             if (!newEntry.getTitle().isBlank()) {
@@ -102,6 +109,7 @@ public class JournalEntryService {
 
             return Optional.of(journalEntryRepository.save(journalEntry));
         }
+        log.info("User {} not found", userName);
         return Optional.empty();
     }
 }
