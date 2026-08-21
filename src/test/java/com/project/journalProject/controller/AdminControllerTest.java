@@ -128,10 +128,9 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void clearAppCache_shouldCallInitAndReturn204() {
-        ResponseEntity<Void> response = adminController.clearAppCache();
+    public void clearAppCache_shouldCallInit() {
+        adminController.clearAppCache();
 
         verify(appCache, times(1)).init();
-        assertEquals(204, response.getStatusCode().value());
     }
 }

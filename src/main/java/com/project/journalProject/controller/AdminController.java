@@ -9,6 +9,7 @@ import com.project.journalProject.service.EmailService;
 import com.project.journalProject.service.UserEntryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,10 +57,9 @@ public class AdminController {
         return ResponseEntity.ok(userRepositoryImplementation.getAllUserForSentimentAnalysis());
     }
 
-    @GetMapping("clear-app-cache")
-    public ResponseEntity<Void> clearAppCache() {
+    @Scheduled(cron = "0 */5 * * * *")
+    public void clearAppCache() {
         appCache.init();
-        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("trigger-email")
