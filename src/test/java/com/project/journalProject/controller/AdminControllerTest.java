@@ -1,5 +1,6 @@
 package com.project.journalProject.controller;
 
+import com.project.journalProject.cache.AppCache;
 import com.project.journalProject.entity.UserEntry;
 import com.project.journalProject.repository.UserEntryRepository;
 import com.project.journalProject.repository.UserRepositoryImplementation;
@@ -30,6 +31,9 @@ public class AdminControllerTest {
 
     @Mock
     private UserRepositoryImplementation userRepositoryImplementation;
+
+    @Mock
+    private AppCache appCache;
 
     @InjectMocks
     private AdminController adminController;
@@ -121,5 +125,13 @@ public class AdminControllerTest {
         ResponseEntity<UserEntry> response = adminController.findEntryByUserName("nonexistent");
 
         assertEquals(404, response.getStatusCode().value());
+    }
+
+    @Test
+    public void clearAppCache_shouldCallInitAndReturn204() {
+        ResponseEntity<Void> response = adminController.clearAppCache();
+
+        verify(appCache, times(1)).init();
+        assertEquals(204, response.getStatusCode().value());
     }
 }

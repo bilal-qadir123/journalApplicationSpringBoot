@@ -24,7 +24,12 @@ public class WeatherService {
     }
 
     public WeatherResponse getWeather(String city) {
-        String url = appCache.appCache.get(AppCache.keys.WEATHER_API.toString());
+        String url = appCache.get(AppCache.keys.WEATHER_API.toString());
+
+        if (url == null) {
+            throw new RuntimeException("Weather API URL not configured in database");
+        }
+
         url = url.replace("{city}", city)
                 .replace("{API_KEY}", API_KEY);
 

@@ -15,13 +15,14 @@ public class AppCache {
     public enum keys {
         WEATHER_API;
     }
+
     private final ConfigJournalAppRepository configJournalAppRepository;
 
     public AppCache(ConfigJournalAppRepository configJournalAppRepository) {
         this.configJournalAppRepository = configJournalAppRepository;
     }
 
-    public Map<String, String> appCache;
+    private Map<String, String> appCache;
 
     @PostConstruct
     public void init() {
@@ -34,5 +35,9 @@ public class AppCache {
                     configJournalAppEntry.getValue()
             );
         }
+    }
+
+    public String get(String key) {
+        return appCache.get(key);
     }
 }

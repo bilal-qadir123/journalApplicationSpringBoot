@@ -5,7 +5,6 @@ import com.project.journalProject.repository.JournalEntryRepository;
 import com.project.journalProject.repository.UserEntryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +17,13 @@ public class UserEntryService {
 
     private final UserEntryRepository userEntryRepository;
     private final JournalEntryRepository journalEntryRepository;
-
-    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserEntryService(UserEntryRepository userEntryRepository, JournalEntryRepository journalEntryRepository) {
+    public UserEntryService(UserEntryRepository userEntryRepository, JournalEntryRepository journalEntryRepository, PasswordEncoder passwordEncoder) {
         this.userEntryRepository = userEntryRepository;
         this.journalEntryRepository = journalEntryRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserEntry createNewUser(UserEntry userEntry) {
@@ -62,11 +61,11 @@ public class UserEntryService {
         if (entry.isPresent()) {
             UserEntry oldEntry = entry.get();
 
-            if (!newEntry.getUserName().isBlank()) {
+            if (newEntry.getUserName() != null && !newEntry.getUserName().isBlank()) {
                 oldEntry.setUserName(newEntry.getUserName());
             }
 
-            if (!newEntry.getPassword().isBlank()) {
+            if (newEntry.getPassword() != null && !newEntry.getPassword().isBlank()) {
                 oldEntry.setPassword(passwordEncoder.encode(newEntry.getPassword()));
             }
 
@@ -82,4 +81,4 @@ public class UserEntryService {
         log.info("User {} not found", userName);
         return Optional.empty();
     }
-}
+}
