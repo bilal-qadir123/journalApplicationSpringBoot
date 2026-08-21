@@ -1,2 +1,11 @@
-spring.mongodb.uri=mongodb+srv://<username>:<password>@<cluster-url>/<database-name>
+spring.mongodb.uri=mongodb+srv://<username>:<password>@<cluster-host>/<database>
 spring.data.mongodb.auto-index-creation=true
+logging.level.com.project.journalProject=DEBUG
+weather.api.key=your-weather-api-key
+
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=your-email@gmail.com
+spring.mail.password=your-app-password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true

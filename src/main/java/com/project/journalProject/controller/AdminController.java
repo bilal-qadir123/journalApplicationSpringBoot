@@ -1,9 +1,11 @@
 package com.project.journalProject.controller;
 
 import com.project.journalProject.cache.AppCache;
+import com.project.journalProject.entity.EmailEntry;
 import com.project.journalProject.entity.UserEntry;
 import com.project.journalProject.repository.UserEntryRepository;
 import com.project.journalProject.repository.UserRepositoryImplementation;
+import com.project.journalProject.service.EmailService;
 import com.project.journalProject.service.UserEntryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +21,14 @@ public class AdminController {
     private final UserEntryRepository userEntryRepository;
     private final UserRepositoryImplementation userRepositoryImplementation;
     private final AppCache appCache;
+    private final EmailService emailService;
 
-    public AdminController(UserEntryService userEntryService, UserEntryRepository userEntryRepository, UserRepositoryImplementation userRepositoryImplementation, AppCache appCache) {
+    public AdminController(UserEntryService userEntryService, UserEntryRepository userEntryRepository, UserRepositoryImplementation userRepositoryImplementation, AppCache appCache, EmailService emailService) {
         this.userEntryService = userEntryService;
         this.userEntryRepository = userEntryRepository;
         this.userRepositoryImplementation = userRepositoryImplementation;
         this.appCache = appCache;
+        this.emailService = emailService;
     }
 
     @GetMapping("all-users")
@@ -55,6 +59,12 @@ public class AdminController {
     @GetMapping("clear-app-cache")
     public ResponseEntity<Void> clearAppCache() {
         appCache.init();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("trigger-email")
+    public ResponseEntity<Void> sendEmail(@RequestBody EmailEntry emailEntry) {
+        emailService.sendEmail(emailEntry.getRecipientEmail(), emailEntry.getSubject(), emailEntry.getBody());
         return ResponseEntity.noContent().build();
     }
 }
