@@ -1,5 +1,6 @@
 package com.project.journalProject.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
@@ -26,6 +27,7 @@ public class UserEntry {
     private boolean sentimentAnalysis;
 
     @NonNull
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @DBRef

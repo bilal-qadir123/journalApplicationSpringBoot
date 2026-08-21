@@ -4,6 +4,7 @@ import com.project.journalProject.entity.JournalEntry;
 import com.project.journalProject.entity.UserEntry;
 import com.project.journalProject.repository.JournalEntryRepository;
 import com.project.journalProject.repository.UserEntryRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,13 +34,20 @@ public class UserServiceTest {
 
     private UserEntry testUser;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
 
         testUser = new UserEntry("bilal", "rawPassword123");
         testUser.setRoles(List.of("USER"));
         testUser.setJournalEntryList(new ArrayList<>());
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        closeable.close();
     }
 
 
@@ -133,14 +141,13 @@ public class UserServiceTest {
         when(userEntryRepository.save(any(UserEntry.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         UserEntry updatedData = new UserEntry("bilalUpdated", "newPassword");
-        updatedData.setRoles(List.of("USER", "ADMIN"));
 
         Optional<UserEntry> result = userEntryService.updateEntryByUserName("bilal", updatedData);
 
         assertTrue(result.isPresent());
         assertEquals("bilalUpdated", result.get().getUserName());
         assertTrue(result.get().getPassword().startsWith("$2a$"), "Updated password should be hashed");
-        assertEquals(List.of("USER", "ADMIN"), result.get().getRoles());
+        assertEquals(List.of("USER"), result.get().getRoles(), "Roles should not be changed through update endpoint");
     }
 
     @Test

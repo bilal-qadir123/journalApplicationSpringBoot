@@ -29,9 +29,11 @@ public class UserEntryControllerTest {
     @InjectMocks
     private UserEntryController userEntryController;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken("bilal", null, Collections.emptyList());
@@ -39,30 +41,9 @@ public class UserEntryControllerTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    public void tearDown() throws Exception {
         SecurityContextHolder.clearContext();
-    }
-
-    @Test
-    public void getUser_shouldReturn200_whenUserExists() {
-        UserEntry user = new UserEntry("bilal", "hashedPass");
-        user.setRoles(List.of("USER"));
-
-        when(userEntryService.getEntryByUserName("bilal")).thenReturn(Optional.of(user));
-
-        ResponseEntity<UserEntry> response = userEntryController.findEntryByUserName("bilal");
-
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals("bilal", response.getBody().getUserName());
-    }
-
-    @Test
-    public void getUser_shouldReturn404_whenUserNotFound() {
-        when(userEntryService.getEntryByUserName("nonexistent")).thenReturn(Optional.empty());
-
-        ResponseEntity<UserEntry> response = userEntryController.findEntryByUserName("nonexistent");
-
-        assertEquals(404, response.getStatusCode().value());
+        closeable.close();
     }
 
     @Test

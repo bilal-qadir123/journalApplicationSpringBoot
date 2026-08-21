@@ -23,13 +23,6 @@ public class UserEntryController {
         this.weatherService = weatherService;
     }
 
-    /* Kept for future use by admin */
-    @GetMapping("{userName}")
-    public ResponseEntity<UserEntry> findEntryByUserName(@PathVariable String userName) {
-        return userEntryService.getEntryByUserName(userName)
-                .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
-
     @DeleteMapping()
     public ResponseEntity<UserEntry> deleteByUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

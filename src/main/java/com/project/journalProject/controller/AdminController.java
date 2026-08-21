@@ -37,6 +37,12 @@ public class AdminController {
         return ResponseEntity.ok(userEntryService.createNewAdmin(userEntry));
     }
 
+    @GetMapping("user/{userName}")
+    public ResponseEntity<UserEntry> findEntryByUserName(@PathVariable String userName) {
+        return userEntryService.getEntryByUserName(userName)
+                .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("get-users-for-sentiment-analysis")
     public ResponseEntity<List<UserEntry>> getAllUsersForSentimentAnalysis() {
         return ResponseEntity.ok(userRepositoryImplementation.getAllUserForSentimentAnalysis());

@@ -70,10 +70,6 @@ public class UserEntryService {
                 oldEntry.setPassword(passwordEncoder.encode(newEntry.getPassword()));
             }
 
-            if(newEntry.getRoles() != null && !newEntry.getRoles().isEmpty()) {
-                oldEntry.setRoles(newEntry.getRoles());
-            }
-
             return Optional.of(userEntryRepository.save(oldEntry));
         }
 

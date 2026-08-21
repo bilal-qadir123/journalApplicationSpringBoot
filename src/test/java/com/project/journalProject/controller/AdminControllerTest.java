@@ -2,7 +2,9 @@ package com.project.journalProject.controller;
 
 import com.project.journalProject.entity.UserEntry;
 import com.project.journalProject.repository.UserEntryRepository;
+import com.project.journalProject.repository.UserRepositoryImplementation;
 import com.project.journalProject.service.UserEntryService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,12 +28,22 @@ public class AdminControllerTest {
     @Mock
     private UserEntryRepository userEntryRepository;
 
+    @Mock
+    private UserRepositoryImplementation userRepositoryImplementation;
+
     @InjectMocks
     private AdminController adminController;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        closeable.close();
     }
 
     @Test
@@ -74,5 +87,27 @@ public class AdminControllerTest {
         assertEquals("newAdmin", response.getBody().getUserName());
         assertEquals(List.of("USER", "ADMIN"), response.getBody().getRoles());
         verify(userEntryService, times(1)).createNewAdmin(any(UserEntry.class));
+    }
+
+    @Test
+    public void findEntryByUserName_shouldReturn200_whenUserExists() {
+        UserEntry user = new UserEntry("bilal", "hashedPass");
+        user.setRoles(List.of("USER"));
+
+        when(userEntryService.getEntryByUserName("bilal")).thenReturn(Optional.of(user));
+
+        ResponseEntity<UserEntry> response = adminController.findEntryByUserName("bilal");
+
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals("bilal", response.getBody().getUserName());
+    }
+
+    @Test
+    public void findEntryByUserName_shouldReturn404_whenUserNotFound() {
+        when(userEntryService.getEntryByUserName("nonexistent")).thenReturn(Optional.empty());
+
+        ResponseEntity<UserEntry> response = adminController.findEntryByUserName("nonexistent");
+
+        assertEquals(404, response.getStatusCode().value());
     }
 }
