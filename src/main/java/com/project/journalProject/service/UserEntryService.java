@@ -70,6 +70,12 @@ public class UserEntryService {
                 oldEntry.setPassword(passwordEncoder.encode(newEntry.getPassword()));
             }
 
+            if (newEntry.getEmail() != null && !newEntry.getEmail().isBlank()) {
+                oldEntry.setEmail(newEntry.getEmail());
+            }
+
+            oldEntry.setSentimentAnalysis(newEntry.isSentimentAnalysis());
+
             return Optional.of(userEntryRepository.save(oldEntry));
         }
 

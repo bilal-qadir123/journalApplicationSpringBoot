@@ -3,6 +3,7 @@ package com.project.journalProject.controller;
 import com.project.journalProject.entity.UserEntry;
 import com.project.journalProject.service.UserEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,10 @@ public class PublicController {
 
     @PostMapping
     public ResponseEntity<UserEntry> createEntry(@RequestBody UserEntry myEntry) {
-        return ResponseEntity.ok(userEntryService.createNewUser(myEntry));
+        try {
+            return ResponseEntity.ok(userEntryService.createNewUser(myEntry));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 }

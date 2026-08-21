@@ -4,6 +4,7 @@ import com.project.journalProject.entity.UserEntry;
 import com.project.journalProject.repository.UserEntryRepository;
 import com.project.journalProject.repository.UserRepositoryImplementation;
 import com.project.journalProject.service.UserEntryService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,16 +26,16 @@ public class AdminController {
 
     @GetMapping("all-users")
     public ResponseEntity<List<UserEntry>> getAllUsers() {
-        List<UserEntry> allUsers = userEntryRepository.findAll();
-        if (!allUsers.isEmpty()) {
-            return ResponseEntity.ok(allUsers);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(userEntryRepository.findAll());
     }
 
     @PostMapping("add-new-admin")
     public ResponseEntity<UserEntry> createNewAdmin(@RequestBody UserEntry userEntry) {
-        return ResponseEntity.ok(userEntryService.createNewAdmin(userEntry));
+        try {
+            return ResponseEntity.ok(userEntryService.createNewAdmin(userEntry));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
     @GetMapping("user/{userName}")

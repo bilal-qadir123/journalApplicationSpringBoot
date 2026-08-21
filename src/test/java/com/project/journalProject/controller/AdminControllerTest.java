@@ -64,13 +64,14 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void getAllUsers_shouldReturn404_whenNoUsersExist() {
+    public void getAllUsers_shouldReturn200WithEmptyList_whenNoUsersExist() {
         when(userEntryRepository.findAll()).thenReturn(Collections.emptyList());
 
         ResponseEntity<List<UserEntry>> response = adminController.getAllUsers();
 
-        assertEquals(404, response.getStatusCode().value());
-        assertNull(response.getBody());
+        assertEquals(200, response.getStatusCode().value());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().isEmpty());
     }
 
     @Test
@@ -87,6 +88,17 @@ public class AdminControllerTest {
         assertEquals("newAdmin", response.getBody().getUserName());
         assertEquals(List.of("USER", "ADMIN"), response.getBody().getRoles());
         verify(userEntryService, times(1)).createNewAdmin(any(UserEntry.class));
+    }
+
+    @Test
+    public void createNewAdmin_shouldReturn409_whenUsernameAlreadyExists() {
+        when(userEntryService.createNewAdmin(any(UserEntry.class)))
+                .thenThrow(new RuntimeException("Duplicate key"));
+
+        UserEntry requestBody = new UserEntry("existingAdmin", "password123");
+        ResponseEntity<UserEntry> response = adminController.createNewAdmin(requestBody);
+
+        assertEquals(409, response.getStatusCode().value());
     }
 
     @Test

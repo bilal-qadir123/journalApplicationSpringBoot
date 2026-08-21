@@ -51,7 +51,7 @@ public class JournalEntryControllerTest {
         savedEntry.setId(new ObjectId());
 
         when(journalEntryService.createEntry(any(JournalEntry.class), eq("bilal")))
-                .thenReturn(savedEntry);
+                .thenReturn(Optional.of(savedEntry));
 
         JournalEntry inputEntry = new JournalEntry("My Journal");
         inputEntry.setContent("Today was a good day");
@@ -61,6 +61,18 @@ public class JournalEntryControllerTest {
         assertEquals(200, response.getStatusCode().value());
         assertEquals("My Journal", response.getBody().getTitle());
         assertEquals("Today was a good day", response.getBody().getContent());
+    }
+
+    @Test
+    public void createEntry_shouldReturn500_whenCreationFails() {
+        when(journalEntryService.createEntry(any(JournalEntry.class), eq("bilal")))
+                .thenReturn(Optional.empty());
+
+        JournalEntry inputEntry = new JournalEntry("My Journal");
+
+        ResponseEntity<JournalEntry> response = journalEntryController.createEntry(inputEntry);
+
+        assertEquals(500, response.getStatusCode().value());
     }
 
     @Test

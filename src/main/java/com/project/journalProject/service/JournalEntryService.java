@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public class JournalEntryService {
     }
 
     @Transactional
-    public JournalEntry createEntry(JournalEntry journalEntry, String userName) {
+    public Optional<JournalEntry> createEntry(JournalEntry journalEntry, String userName) {
         try {
             Optional<UserEntry> userEntry = userEntryRepository.findByUserName(userName);
 
@@ -39,17 +40,17 @@ public class JournalEntryService {
                 userEntry.get().getJournalEntryList().add(savedEntry);
                 userEntryRepository.save(userEntry.get());
 
-                return savedEntry;
+                return Optional.of(savedEntry);
             }
         } catch (Exception e) {
             log.error("An error occurred while saving the journal", e);
         }
-        return null;
+        return Optional.empty();
     }
 
     public List<JournalEntry> getAllJournalEntriesForUser(String userName) {
         Optional<UserEntry> userEntry = userEntryRepository.findByUserName(userName);
-        return userEntry.map(UserEntry::getJournalEntryList).orElse(null);
+        return userEntry.map(UserEntry::getJournalEntryList).orElse(Collections.emptyList());
     }
 
     public Optional<JournalEntry> getJournalEntriesByUser(String userName, ObjectId id) {

@@ -26,7 +26,9 @@ public class JournalEntryController {
     public ResponseEntity<JournalEntry> createEntry(@RequestBody JournalEntry myEntry) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
-        return ResponseEntity.ok(journalEntryService.createEntry(myEntry, userName));
+        return journalEntryService.createEntry(myEntry, userName)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.internalServerError().build());
     }
 
     @GetMapping()

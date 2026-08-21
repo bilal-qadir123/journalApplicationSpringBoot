@@ -42,4 +42,15 @@ public class PublicControllerTest {
         assertEquals("bilal", response.getBody().getUserName());
         assertEquals(List.of("USER"), response.getBody().getRoles());
     }
+
+    @Test
+    public void createUser_shouldReturn409_whenUsernameAlreadyExists() {
+        when(userEntryService.createNewUser(any(UserEntry.class)))
+                .thenThrow(new RuntimeException("Duplicate key"));
+
+        UserEntry inputUser = new UserEntry("bilal", "password123");
+        ResponseEntity<UserEntry> response = publicController.createEntry(inputUser);
+
+        assertEquals(409, response.getStatusCode().value());
+    }
 }

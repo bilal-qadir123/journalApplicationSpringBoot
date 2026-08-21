@@ -40,12 +40,12 @@ public class UserEntryController {
     }
 
     @GetMapping
-    public ResponseEntity<String> getGreetings() {
+    public ResponseEntity<String> getGreetings(@RequestParam(defaultValue = "Karachi") String city) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
 
         try {
-            WeatherResponse weatherResponse = weatherService.getWeather("Karachi");
+            WeatherResponse weatherResponse = weatherService.getWeather(city);
             return ResponseEntity.ok(
                     "Hi " + userName + ", weather feels like " + weatherResponse.getMain().getFeelsLike()
             );

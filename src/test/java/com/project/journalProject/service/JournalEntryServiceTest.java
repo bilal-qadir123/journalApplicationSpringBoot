@@ -56,22 +56,22 @@ public class JournalEntryServiceTest {
         when(journalEntryRepository.save(any(JournalEntry.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(userEntryRepository.save(any(UserEntry.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        JournalEntry result = journalEntryService.createEntry(newEntry, "bilal");
+        Optional<JournalEntry> result = journalEntryService.createEntry(newEntry, "bilal");
 
-        assertNotNull(result);
-        assertNotNull(result.getDate(), "Date should be set automatically");
+        assertTrue(result.isPresent());
+        assertNotNull(result.get().getDate(), "Date should be set automatically");
         verify(journalEntryRepository, times(1)).save(newEntry);
         verify(userEntryRepository, times(1)).save(testUser);
     }
 
     @Test
-    public void createEntry_shouldReturnNull_whenUserDoesNotExist() {
+    public void createEntry_shouldReturnEmpty_whenUserDoesNotExist() {
         JournalEntry newEntry = new JournalEntry("New Entry");
         when(userEntryRepository.findByUserName("ghost")).thenReturn(Optional.empty());
 
-        JournalEntry result = journalEntryService.createEntry(newEntry, "ghost");
+        Optional<JournalEntry> result = journalEntryService.createEntry(newEntry, "ghost");
 
-        assertNull(result);
+        assertTrue(result.isEmpty());
         verify(journalEntryRepository, never()).save(any());
     }
 
@@ -88,12 +88,13 @@ public class JournalEntryServiceTest {
     }
 
     @Test
-    public void getAllJournalEntriesForUser_shouldReturnNull_whenUserDoesNotExist() {
+    public void getAllJournalEntriesForUser_shouldReturnEmptyList_whenUserDoesNotExist() {
         when(userEntryRepository.findByUserName("ghost")).thenReturn(Optional.empty());
 
         List<JournalEntry> result = journalEntryService.getAllJournalEntriesForUser("ghost");
 
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
 

@@ -141,12 +141,16 @@ public class UserServiceTest {
         when(userEntryRepository.save(any(UserEntry.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         UserEntry updatedData = new UserEntry("bilalUpdated", "newPassword");
+        updatedData.setEmail("bilal@example.com");
+        updatedData.setSentimentAnalysis(true);
 
         Optional<UserEntry> result = userEntryService.updateEntryByUserName("bilal", updatedData);
 
         assertTrue(result.isPresent());
         assertEquals("bilalUpdated", result.get().getUserName());
         assertTrue(result.get().getPassword().startsWith("$2a$"), "Updated password should be hashed");
+        assertEquals("bilal@example.com", result.get().getEmail());
+        assertTrue(result.get().isSentimentAnalysis());
         assertEquals(List.of("USER"), result.get().getRoles(), "Roles should not be changed through update endpoint");
     }
 
