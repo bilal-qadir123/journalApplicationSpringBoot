@@ -1,6 +1,8 @@
 spring.mongodb.uri=mongodb+srv://<username>:<password>@<cluster-host>/<database>
 spring.data.mongodb.auto-index-creation=true
+
 logging.level.com.project.journalProject=DEBUG
+
 weather.api.key=your-weather-api-key
 
 spring.mail.host=smtp.gmail.com

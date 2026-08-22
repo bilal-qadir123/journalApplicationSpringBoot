@@ -2,8 +2,10 @@ package com.project.journalProject.scheduler;
 
 import com.project.journalProject.entity.JournalEntry;
 import com.project.journalProject.entity.UserEntry;
+import com.project.journalProject.enums.Sentiment;
 import com.project.journalProject.repository.UserRepositoryImplementation;
 import com.project.journalProject.service.EmailService;
+import com.project.journalProject.service.SentimentAnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,9 @@ public class UserScheduler {
     @Autowired
     private UserRepositoryImplementation userRepositoryImplementation;
 
+    @Autowired
+    private SentimentAnalysisService sentimentAnalysisService;
+
     @Scheduled(cron = "0 0 9 * * SUN")
     public void fetchUsersAndSendEmail() {
         List<UserEntry> allUsers = userRepositoryImplementation.getAllUserForSentimentAnalysis();
@@ -35,6 +40,15 @@ public class UserScheduler {
                     .collect(Collectors.toList());
 
             String allEntries = String.join("\n---\n", recentContents);
+
+            if (!allEntries.trim().isEmpty()) {
+                Sentiment sentiment = sentimentAnalysisService.getSentiment(allEntries);
+                String subject = "Your Weekly Journal Sentiment Analysis";
+                String body = "Based on your recent entries from the past 7 days, your overall sentiment is: "
+                        + sentiment.name();
+
+                emailService.sendEmail(entries.getEmail(), subject, body);
+            }
         }
     }
 }

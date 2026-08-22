@@ -21,11 +21,13 @@ public class JournalEntryService {
 
     private final JournalEntryRepository journalEntryRepository;
     private final UserEntryRepository userEntryRepository;
+    private final SentimentAnalysisService sentimentAnalysisService;
 
     @Autowired
-    public JournalEntryService(JournalEntryRepository journalEntryRepository, UserEntryRepository userEntryRepository) {
+    public JournalEntryService(JournalEntryRepository journalEntryRepository, UserEntryRepository userEntryRepository, SentimentAnalysisService sentimentAnalysisService) {
         this.journalEntryRepository = journalEntryRepository;
         this.userEntryRepository = userEntryRepository;
+        this.sentimentAnalysisService = sentimentAnalysisService;
     }
 
     @Transactional
@@ -35,6 +37,10 @@ public class JournalEntryService {
 
             if (userEntry.isPresent()) {
                 journalEntry.setDate(LocalDateTime.now());
+                
+                if (journalEntry.getContent() != null && !journalEntry.getContent().isEmpty()) {
+                    journalEntry.setSentiment(sentimentAnalysisService.getSentiment(journalEntry.getContent()));
+                }
 
                 JournalEntry savedEntry = journalEntryRepository.save(journalEntry);
                 userEntry.get().getJournalEntryList().add(savedEntry);
